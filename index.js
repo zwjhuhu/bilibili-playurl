@@ -25,15 +25,15 @@ module.exports = function (cid, options) {
   var quality = options.quality || 0
     , season_type = options.season_type || 0
     , domains = [ "interface.bilibili.com/v2/playurl?", "bangumi.bilibili.com/player/web_api/v2/playurl?", "bangumi.bilibili.com/player/web_api/playurl?" ];
-  delete options.season_type;
   delete options.quality;
+  if(season_type < 1){
+    delete options.season_type;
+  }
+  // 原来的混淆后的代码里面有setTimeout调用,所以用异步
   return new Promise(function (resolve, reject) {
     P.push(resolve);
-    I(domains[+!!season_type], true, cid, quality, "", stringify(Object.assign(options, {
-      qn: quality
-    }, season_type > 0 && {
-      module: ['bangumi', 'movie'][season_type - 1],
-      season_type: season_type
-    })), 0)
+    options.qn = quality;
+    options.module = ['bangumi', 'movie'][season_type - 1];
+    I(domains[+!!season_type], true, cid, quality, "", stringify(options), 0);
   });
 };
